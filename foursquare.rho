@@ -1,0 +1,7 @@
+[connection]
+jid = rerobins@labware/foursquare
+password = pass
+
+[muc]
+room = rhobot@conference.labware
+room_nick = foursquare
