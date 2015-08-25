@@ -1,0 +1,1 @@
+from foursquare_bot.components.commands.configure_client_details import configure_client_details

@@ -2,8 +2,10 @@
 Knowledge provider that will respond to requests made by the rdf publisher or another bot.
 """
 from sleekxmpp.plugins.base import base_plugin
+from rhobot.components.storage.enums import FindFlags
 from rhobot.components.storage.client import StoragePayload
-from foursquare.components.namespace import WGS_84
+from foursquare_bot.components.namespace import WGS_84
+from foursquare_bot.components.utilities import get_foursquare_venue
 import logging
 
 logger = logging.getLogger(__name__)
@@ -29,13 +31,18 @@ class KnowledgeProvider(base_plugin):
         form = rdf_payload['form']
 
         payload = StoragePayload(form)
+        payload.add_flag(FindFlags.CREATE_IF_MISSING, True)
 
         intersection = self.type_requirements.intersection(set(payload.types()))
 
-        if len(intersection) == len(payload.types()):
-            results = self.xmpp['rho_bot_storage_client'].find_nodes(payload)
-            if len(results.results()):
-                return results
+        if len(intersection) == len(self. type_requirements):
+
+            venue = get_foursquare_venue(payload)
+
+            if venue:
+                results = self.xmpp['rho_bot_storage_client'].find_nodes(payload)
+                if len(results.results()):
+                    return results
 
         return None
 

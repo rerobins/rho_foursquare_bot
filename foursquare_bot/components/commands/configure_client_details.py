@@ -1,7 +1,7 @@
 import logging
 from sleekxmpp.plugins.base import base_plugin
-from foursquare.components.configuration_enums import IDENTIFIER_KEY, CLIENT_SECRET_KEY
-from foursquare.components.events import OAUTH_DETAILS_UPDATED
+from foursquare_bot.components.configuration_enums import IDENTIFIER_KEY, CLIENT_SECRET_KEY
+from foursquare_bot.components.events import OAUTH_DETAILS_UPDATED
 
 logger = logging.getLogger(__name__)
 

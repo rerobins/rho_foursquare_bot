@@ -1,1 +1,0 @@
-from foursquare.components.events.oauth import OAUTH_DETAILS_UPDATED
