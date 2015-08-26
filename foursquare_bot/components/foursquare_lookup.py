@@ -18,7 +18,7 @@ class FoursquareLookup(base_plugin):
         self.xmpp.add_event_handler(BotConfiguration.CONFIGURATION_RECEIVED_EVENT, self._configuration_updated)
         self._foursquare_client = None
 
-    def _configuration_updated(self):
+    def _configuration_updated(self, event):
         """
         Check to see if the properties for the foursquare service are available, updated, and then create the client
         library to use in this bot.
@@ -58,7 +58,7 @@ class FoursquareLookup(base_plugin):
         # Attempt to look up the venue id from the details in the node.
         if foursquare_identifier is None:
             result = self.xmpp['rho_bot_storage_client'].get_node(search_payload)
-            for see_also in result.properties().get(RDFS.seeAlso, []):
+            for see_also in result.properties().get(str(RDFS.seeAlso), []):
                 venue = get_foursquare_venue_from_url(see_also)
                 if venue:
                     break
@@ -83,7 +83,9 @@ class FoursquareLookup(base_plugin):
             foursquare_to_storage(venue_details['venue'], storage_payload)
             storage_payload.about = node_uri
 
-            self.xmpp['rho_bot_storage_client'].update_node(storage_payload)
+            return self.xmpp['rho_bot_storage_client'].update_node(storage_payload)
+
+        return None
 
 
 foursquare_lookup = FoursquareLookup

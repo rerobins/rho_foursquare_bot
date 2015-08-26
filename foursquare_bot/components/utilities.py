@@ -49,10 +49,13 @@ def foursquare_to_storage(foursquare, storage):
     :param storage: storage object.
     :return: storage object.
     """
-    storage.add_types(WGS_84.SpatialThing)
+    storage.add_type(WGS_84.SpatialThing)
     storage.add_property(RDFS.seeAlso, 'foursquare://venues/%s' % foursquare['id'])
-    storage.add_property(WGS_84.lat, foursquare['location']['lat'])
-    storage.add_property(WGS_84.long, foursquare['location']['long'])
     storage.add_property(SCHEMA.name, foursquare['name'])
+
+    location = foursquare['location']
+    if 'lat' in location and 'lng' in location:
+        storage.add_property(WGS_84.lat, location['lat'])
+        storage.add_property(WGS_84.long, location['lng'])
 
     return storage
