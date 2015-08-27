@@ -1,5 +1,6 @@
 from sleekxmpp.plugins.base import base_plugin
 from rhobot.components.configuration import BotConfiguration
+from rhobot.components.storage import StoragePayload
 from foursquare_bot.components.configuration_enums import CLIENT_SECRET_KEY, IDENTIFIER_KEY
 from foursquare_bot.components.utilities import get_foursquare_venue_from_url, foursquare_to_storage
 import logging
@@ -50,7 +51,7 @@ class FoursquareLookup(base_plugin):
         :return:
         """
 
-        search_payload = self.xmpp['rho_bot_storage_client'].create_payload()
+        search_payload = StoragePayload()
         search_payload.about = node_uri
 
         venue = None
@@ -58,7 +59,7 @@ class FoursquareLookup(base_plugin):
         # Attempt to look up the venue id from the details in the node.
         if foursquare_identifier is None:
             result = self.xmpp['rho_bot_storage_client'].get_node(search_payload)
-            for see_also in result.properties().get(str(RDFS.seeAlso), []):
+            for see_also in result.properties.get(str(RDFS.seeAlso), []):
                 venue = get_foursquare_venue_from_url(see_also)
                 if venue:
                     break
@@ -79,7 +80,7 @@ class FoursquareLookup(base_plugin):
 
         # Translate the venue details into a rdf storage payload for sending to update.
         if 'venue' in venue_details:
-            storage_payload = self.xmpp['rho_bot_storage_client'].create_payload()
+            storage_payload = StoragePayload()
             foursquare_to_storage(venue_details['venue'], storage_payload)
             storage_payload.about = node_uri
 

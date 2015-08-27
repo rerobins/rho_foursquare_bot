@@ -33,7 +33,7 @@ class KnowledgeProvider(base_plugin):
         payload = StoragePayload(form)
         payload.add_flag(FindFlags.CREATE_IF_MISSING, True)
 
-        intersection = self.type_requirements.intersection(set(payload.types()))
+        intersection = self.type_requirements.intersection(set(payload.types))
 
         if len(intersection) == len(self. type_requirements):
 
@@ -41,7 +41,7 @@ class KnowledgeProvider(base_plugin):
 
             if venue:
                 results = self.xmpp['rho_bot_storage_client'].find_nodes(payload)
-                if len(results.results()):
+                if len(results.results):
                     return results
 
         return None

@@ -15,8 +15,8 @@ def get_foursquare_venue(payload):
     :return:
     """
     venue = None
-    if str(WGS_84.SpatialThing) in payload.types():
-        properties = payload.properties()
+    if str(WGS_84.SpatialThing) in payload.types:
+        properties = payload.properties
         see_alsos = properties.get(str(RDFS.seeAlso), None)
         if see_alsos:
             for see_also in see_alsos:
