@@ -96,7 +96,7 @@ class FoursquareLookup(base_plugin):
         """
 
         def method():
-            self.lookup_foursquare_content(node_uri, foursquare_identifier)
+            return self.lookup_foursquare_content(node_uri, foursquare_identifier)
 
         return self.xmpp['rho_bot_scheduler'].defer(method).then(self._publish_update)
 
