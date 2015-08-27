@@ -89,18 +89,9 @@ class KnowledgeMaintainer(base_plugin):
         if not node_uri:
             raise Exception('No node defined')
 
-        result = self.xmpp['foursquare_lookup'].lookup_foursquare_content(node_uri)
+        promise = self.xmpp['foursquare_lookup'].schedule_lookup(node_uri).then(lambda s: session)
 
-        if not result:
-            raise Exception('Error populating foursquare content')
-
-        for res in result.results:
-            publish_payload = self.xmpp['rho_bot_storage_client'].create_payload()
-            publish_payload.about = res.about
-            publish_payload.add_type(*res.types)
-            self.xmpp['rho_bot_rdf_publish'].publish_update(publish_payload)
-
-        return session
+        return promise
 
     def _schedule_work_to_do(self, session):
         logger.info('Scheduling cause there is still work to do.')

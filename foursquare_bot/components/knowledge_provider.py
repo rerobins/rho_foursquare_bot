@@ -2,7 +2,7 @@
 Knowledge provider that will respond to requests made by the rdf publisher or another bot.
 """
 from sleekxmpp.plugins.base import base_plugin
-from rhobot.components.storage.enums import FindFlags
+from rhobot.components.storage.enums import FindFlags, FindResults
 from rhobot.components.storage.client import StoragePayload
 from foursquare_bot.components.namespace import WGS_84
 from foursquare_bot.components.utilities import get_foursquare_venue
@@ -14,7 +14,7 @@ logger = logging.getLogger(__name__)
 class KnowledgeProvider(base_plugin):
     name = 'knowledge_provider'
     description = 'Knowledge Provider'
-    dependencies = {'rho_bot_storage_client', 'rho_bot_rdf_publish', }
+    dependencies = {'rho_bot_storage_client', 'rho_bot_rdf_publish', 'foursquare_lookup', }
 
     type_requirements = {str(WGS_84.SpatialThing), }
 
@@ -42,6 +42,20 @@ class KnowledgeProvider(base_plugin):
             if venue:
                 results = self.xmpp['rho_bot_storage_client'].find_nodes(payload)
                 if len(results.results):
+
+                    # If the node was created, then publish it to the channel, and then send it to the foursquare
+                    # lookup for updating.
+                    for res in results.results:
+                        if res.flags.get(FindResults.CREATED.value, False):
+                            # Lookup the details
+                            self.xmpp['foursquare_lookup'].schedule_lookup(res.about)
+
+                            # Publish to the channel
+                            publish_payload = self.xmpp['rho_bot_storage_client'].create_payload()
+                            publish_payload.about = res.about
+                            publish_payload.add_type(*res.types)
+                            self.xmpp['rho_bot_rdf_publish'].publish_create(publish_payload)
+
                     return results
 
         return None

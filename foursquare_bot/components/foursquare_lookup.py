@@ -88,5 +88,30 @@ class FoursquareLookup(base_plugin):
 
         return None
 
+    def schedule_lookup(self, node_uri, foursquare_identifier=None):
+        """
+        Schedule a lookup on the node to be executed later.
+        :param node_uri: uri to look up.
+        :return:
+        """
+
+        def method():
+            self.lookup_foursquare_content(node_uri, foursquare_identifier)
+
+        return self.xmpp['rho_bot_scheduler'].defer(method).then(self._publish_update)
+
+    def _publish_update(self, result):
+        """
+        Publish the update information to the channel.
+        :param result: result collection
+        :return:
+        """
+        # Publish to the channel
+        for res in result.results:
+            publish_payload = self.xmpp['rho_bot_storage_client'].create_payload()
+            publish_payload.about = res.about
+            publish_payload.add_type(*res.types)
+            self.xmpp['rho_bot_rdf_publish'].publish_update(publish_payload)
+
 
 foursquare_lookup = FoursquareLookup
