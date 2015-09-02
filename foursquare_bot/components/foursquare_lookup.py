@@ -113,5 +113,22 @@ class FoursquareLookup(base_plugin):
             publish_payload.add_type(*res.types)
             self.xmpp['rho_bot_rdf_publish'].publish_update(publish_payload)
 
+    def search_foursquare(self, near, query=None):
+        """
+        Search foursquare.
+        :param near: near a location
+        :param query: query to search for.
+        :return: list of id, name dictionaries.
+        """
+        parameters = dict(near=near, limit=10)
+        if query:
+            parameters['query'] = query
+
+        venue_results = self._foursquare_client.venues.search(parameters)
+
+        logger.debug('venue_results: %s' % venue_results['venues'])
+
+        return venue_results['venues']
+
 
 foursquare_lookup = FoursquareLookup
