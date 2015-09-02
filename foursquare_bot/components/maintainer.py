@@ -62,9 +62,9 @@ class KnowledgeMaintainer(base_plugin):
         """
         query = """MATCH (n:`%s`)
                    WHERE any(seealso IN n.`%s` WHERE seealso =~ '^foursquare:.*')
-                   and not(has(n.`%s`)) RETURN n LIMIT 1""" % (str(WGS_84.SpatialThing),
-                                                               str(RDFS.seeAlso),
-                                                               str(SCHEMA.name))
+                   and not(has(n.`%s`)) RETURN n as node LIMIT 1""" % (str(WGS_84.SpatialThing),
+                                                                       str(RDFS.seeAlso),
+                                                                       str(SCHEMA.name))
 
         logger.debug('Executing query: %s' % query)
 
