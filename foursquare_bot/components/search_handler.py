@@ -21,7 +21,7 @@ class SearchHandler(base_plugin):
     """
     name = 'search_handler'
     description = 'Knowledge Provider'
-    dependencies = {'rho_bot_storage_client', 'rho_bot_rdf_publish', }
+    dependencies = {'rho_bot_storage_client', 'rho_bot_rdf_publish', 'search_venues', }
 
     type_requirements = {str(WGS_84.SpatialThing), }
 
@@ -61,7 +61,7 @@ class SearchHandler(base_plugin):
         for res in result.results:
             print '  %s (%s)' % (res.flags[str(SCHEMA.name)], res.flags['http://degree'])
 
-        return result
+        return result, self.xmpp['search_venues'].name
 
 
 search_handler = SearchHandler
