@@ -72,8 +72,17 @@ class SearchVenues(BaseCommand):
         return session
 
     def select_item(self, payload, session):
+        """
+        Process the selected item by:
+        place in the node database
+        schedule a look up of the details.
+        return the value and label of the location so that it can be used in any parent commands.
+        :param payload:
+        :param session:
+        :return:
+        """
 
-        logger.info('Received payload: %s' % payload)
+        logger.debug('Received payload: %s' % payload)
 
         form = self.xmpp['xep_0004'].make_form(ftype='result')
 
