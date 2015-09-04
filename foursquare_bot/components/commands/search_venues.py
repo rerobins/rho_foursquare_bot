@@ -91,7 +91,7 @@ class SearchVenues(BaseCommand):
 
         location_id = payload.get_fields()['location'].get_value()
 
-        form.add_item({'value': location_id,
+        form.add_item({'value': 'foursquare://venues/%s' % location_id,
                        'label': session['venues'][location_id]['name']})
 
         session['has_next'] = False
