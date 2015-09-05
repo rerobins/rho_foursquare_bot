@@ -46,7 +46,7 @@ class KnowledgeProvider(base_plugin):
                     # If the node was created, then publish it to the channel, and then send it to the foursquare
                     # lookup for updating.
                     for res in results.results:
-                        if res.flags.get(FindResults.CREATED.value, False):
+                        if FindResults.CREATED.fetch_from(res.flags):
                             # Lookup the details
                             self.xmpp['foursquare_lookup'].schedule_lookup(res.about)
 

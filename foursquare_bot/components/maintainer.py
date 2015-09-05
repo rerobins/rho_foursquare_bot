@@ -4,6 +4,8 @@ This is a module that will attempt to populate the empty foursquare details
 from sleekxmpp.plugins.base import base_plugin
 from rhobot.components.configuration import BotConfiguration
 from foursquare_bot.components.namespace import WGS_84, SCHEMA
+from rhobot.components.storage import StoragePayload
+from rhobot.components.storage.namespace import NEO4J
 from rdflib.namespace import RDFS
 import logging
 
@@ -68,7 +70,9 @@ class KnowledgeMaintainer(base_plugin):
 
         logger.debug('Executing query: %s' % query)
 
-        result = self.xmpp['rho_bot_storage_client'].execute_cypher(query)
+        payload = StoragePayload()
+        payload.add_property(key=NEO4J.cypher, value=query)
+        result = self.xmpp['rho_bot_storage_client'].execute_cypher(payload)
 
         if not result.results:
             raise Exception('No results to work')

@@ -11,6 +11,8 @@ from rhobot.components.storage.enums import CypherFlags
 from sleekxmpp.plugins.base import base_plugin
 from foursquare_bot.components.namespace import WGS_84, SCHEMA
 from rdflib.namespace import RDFS
+from rhobot.components.storage import StoragePayload
+from rhobot.components.storage.namespace import NEO4J
 
 logger = logging.getLogger(__name__)
 
@@ -46,20 +48,22 @@ class SearchHandler(base_plugin):
                                                      str(SCHEMA.name))
 
         translation_key = dict()
-        translation_key.update(json.loads(CypherFlags.TRANSLATION_KEY.value['default']))
+        translation_key.update(json.loads(CypherFlags.TRANSLATION_KEY.default))
         translation_key[str(SCHEMA.name)] = 'name'
         translation_key['http://degree'] = 'rels'
 
-        params = {CypherFlags.TRANSLATION_KEY.value['var']: json.dumps(translation_key)}
-
         logger.debug('Executing query: %s' % query)
 
-        result = self.xmpp['rho_bot_storage_client'].execute_cypher(query, **params)
+        payload = StoragePayload()
+        payload.add_property(key=NEO4J.cypher, value=query)
+        payload.add_flag(CypherFlags.TRANSLATION_KEY, json.dumps(translation_key))
+
+        result = self.xmpp['rho_bot_storage_client'].execute_cypher(payload)
 
         print 'Found: %s results' % len(result.results)
 
         for res in result.results:
-            print '  %s (%s)' % (res.flags[str(SCHEMA.name)], res.flags['http://degree'])
+            print '  %s (%s)' % (res.get_column(str(SCHEMA.name)), res.get_column('http://degree'))
 
         return result, self.xmpp['search_venues'].name
 
