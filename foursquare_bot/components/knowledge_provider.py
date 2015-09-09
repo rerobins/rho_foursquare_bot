@@ -51,7 +51,7 @@ class KnowledgeProvider(base_plugin):
                             self.xmpp['foursquare_lookup'].schedule_lookup(res.about)
 
                             # Publish to the channel
-                            publish_payload = self.xmpp['rho_bot_storage_client'].create_payload()
+                            publish_payload = StoragePayload()
                             publish_payload.about = res.about
                             publish_payload.add_type(*res.types)
                             self.xmpp['rho_bot_rdf_publish'].publish_create(publish_payload)

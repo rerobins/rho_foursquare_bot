@@ -108,7 +108,7 @@ class FoursquareLookup(base_plugin):
         """
         # Publish to the channel
         for res in result.results:
-            publish_payload = self.xmpp['rho_bot_storage_client'].create_payload()
+            publish_payload = StoragePayload()
             publish_payload.about = res.about
             publish_payload.add_type(*res.types)
             self.xmpp['rho_bot_rdf_publish'].publish_update(publish_payload)
