@@ -19,13 +19,19 @@ class FoursquareLookup(base_plugin):
         self.xmpp.add_event_handler(BotConfiguration.CONFIGURATION_RECEIVED_EVENT, self._configuration_updated)
         self._foursquare_client = None
 
+    def post_init(self):
+        self._configuration = self.xmpp['rho_bot_configuration']
+        self._storage_client = self.xmpp['rho_bot_storage_client']
+        self._rdf_publish = self.xmpp['rho_bot_storage_client']
+        self._scheduler = self.xmpp['rho_bot_scheduler']
+
     def _configuration_updated(self, event):
         """
         Check to see if the properties for the foursquare service are available, updated, and then create the client
         library to use in this bot.
         :return:
         """
-        configuration = self.xmpp['rho_bot_configuration'].get_configuration()
+        configuration = self._configuration.get_configuration()
 
         client_secret = configuration.get(CLIENT_SECRET_KEY, None)
         identifier = configuration.get(IDENTIFIER_KEY, None)
@@ -58,7 +64,7 @@ class FoursquareLookup(base_plugin):
 
         # Attempt to look up the venue id from the details in the node.
         if foursquare_identifier is None:
-            result = self.xmpp['rho_bot_storage_client'].get_node(search_payload)
+            result = self._storage_client.get_node(search_payload)
             for see_also in result.properties.get(str(RDFS.seeAlso), []):
                 venue = get_foursquare_venue_from_url(see_also)
                 if venue:
@@ -84,7 +90,7 @@ class FoursquareLookup(base_plugin):
             foursquare_to_storage(venue_details['venue'], storage_payload)
             storage_payload.about = node_uri
 
-            return self.xmpp['rho_bot_storage_client'].update_node(storage_payload)
+            return self._storage_client.update_node(storage_payload)
 
         return None
 
@@ -98,7 +104,7 @@ class FoursquareLookup(base_plugin):
         def method():
             return self.lookup_foursquare_content(node_uri, foursquare_identifier)
 
-        return self.xmpp['rho_bot_scheduler'].defer(method).then(self._publish_update)
+        return self._scheduler.defer(method).then(self._publish_update)
 
     def _publish_update(self, result):
         """
@@ -107,11 +113,12 @@ class FoursquareLookup(base_plugin):
         :return:
         """
         # Publish to the channel
+        # TODO: I think this needs to be turned into a method to remove duplicate code for all of the plugins
         for res in result.results:
             publish_payload = StoragePayload()
             publish_payload.about = res.about
             publish_payload.add_type(*res.types)
-            self.xmpp['rho_bot_rdf_publish'].publish_update(publish_payload)
+            self._rdf_publish.publish_update(publish_payload)
 
     def search_foursquare(self, near, query=None):
         """
