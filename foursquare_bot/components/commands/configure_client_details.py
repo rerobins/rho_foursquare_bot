@@ -17,6 +17,11 @@ class ConfigureClientDetails(base_plugin):
     def plugin_init(self):
         self.xmpp.add_event_handler('session_start', self._start)
 
+    def post_init(self):
+        super(ConfigureClientDetails, self).post_init()
+
+        self._configuration = self.xmpp['rho_bot_configuration']
+
     def _start(self, event):
         """
         Notify the command service of all commands that this plugin will provide.
@@ -34,8 +39,8 @@ class ConfigureClientDetails(base_plugin):
         """
         form = self.xmpp['xep_0004'].make_form()
 
-        previous_identifier = self.xmpp['rho_bot_configuration'].get_value(IDENTIFIER_KEY, 'unset')
-        previous_secret = self.xmpp['rho_bot_configuration'].get_value(CLIENT_SECRET_KEY, 'unset')
+        previous_identifier = self._configuration.get_value(IDENTIFIER_KEY, 'unset')
+        previous_secret = self._configuration.get_value(CLIENT_SECRET_KEY, 'unset')
 
         form.add_field(var='client_id', ftype='text-single', label='Client Identifier',
                        desc='Client Identifier from Move API Console',
@@ -65,7 +70,7 @@ class ConfigureClientDetails(base_plugin):
 
         logger.info('Secret: %s, Identifier: %s' % (secret, identifier))
 
-        self.xmpp['rho_bot_configuration'].merge_configuration({IDENTIFIER_KEY: identifier, CLIENT_SECRET_KEY: secret})
+        self._configuration.merge_configuration({IDENTIFIER_KEY: identifier, CLIENT_SECRET_KEY: secret})
 
         session['has_next'] = False
         session['payload'] = None

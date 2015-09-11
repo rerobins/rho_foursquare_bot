@@ -4,7 +4,7 @@ Test the work of the knowledge provider tool.
 
 import unittest
 from rhobot.components.storage import StoragePayload
-from foursquare_bot.components.namespace import WGS_84
+from rhobot.namespace import WGS_84
 from foursquare_bot.components.utilities import get_foursquare_venue
 from rdflib.namespace import RDFS
 

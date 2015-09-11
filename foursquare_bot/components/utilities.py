@@ -3,7 +3,7 @@ Collection of utilities for the foursquare provider.
 """
 # TODO: build translation key between foursquare categories and dbpedia.org/ontology
 # See: http://www.geonames.org/ontology/mappings_v3.01.rdf
-from foursquare_bot.components.namespace import WGS_84, SCHEMA
+from rhobot.namespace import WGS_84, SCHEMA
 from rdflib.namespace import RDFS
 import urlparse
 

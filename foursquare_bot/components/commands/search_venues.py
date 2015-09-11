@@ -14,7 +14,11 @@ class SearchVenues(BaseCommand):
 
         logger.info('Initialize Command')
         self._initialize_command(identifier='search_venues', name='Search Venues',
-                                 additional_dependencies={'foursquare_lookup'})
+                                 additional_dependencies={'foursquare_lookup', })
+
+    def post_init(self):
+        super(SearchVenues, self).post_init()
+        self._foursquare_lookup = self.xmpp['foursquare_lookup']
 
     def command_start(self, request, initial_session):
         """
@@ -23,7 +27,7 @@ class SearchVenues(BaseCommand):
         :param initial_session:
         :return:
         """
-        form = self.xmpp['xep_0004'].make_form()
+        form = self._forms.make_form()
 
         form.add_field(var='near', label='Near', ftype='text-single', description='Search City')
         form.add_field(var='query', label='Query', ftype='text-single', description='Query String')
@@ -46,7 +50,7 @@ class SearchVenues(BaseCommand):
         query = form.get_fields()['query'].get_value()
 
         # Search the foursquare database for the contents.
-        results = self.xmpp['foursquare_lookup'].search_foursquare(near=near, query=query)
+        results = self._foursquare_lookup.search_foursquare(near=near, query=query)
 
         session['venues'] = {}
         options = []
@@ -62,7 +66,7 @@ class SearchVenues(BaseCommand):
 
             options.append(dict(value=location_id, label=name))
 
-        new_form = self.xmpp['xep_0004'].make_form()
+        new_form = self._forms.make_form()
         new_form.add_field(var='location', label='Select Location', options=options, type='list-single')
 
         session['payload'] = new_form
@@ -84,7 +88,7 @@ class SearchVenues(BaseCommand):
 
         logger.debug('Received payload: %s' % payload)
 
-        form = self.xmpp['xep_0004'].make_form(ftype='result')
+        form = self._forms.make_form(ftype='result')
 
         form.add_reported(var='value', ftype='text-single')
         form.add_reported(var='label', ftype='text-single')
