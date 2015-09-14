@@ -79,7 +79,9 @@ class SearchHandler(base_plugin):
             for res in result.results:
                 logger.debug('  %s (%s)' % (res.get_column(str(SCHEMA.name)), res.get_column(str(GRAPH.degree))))
 
-        rdf_data = self._rdf_publish.create_rdf(mtype=RDFStanzaType.SEARCH_RESPONSE, payload=result)
+        rdf_data = self._rdf_publish.create_rdf(mtype=RDFStanzaType.SEARCH_RESPONSE, payload=result,
+                                                source_name="Search Foursquare",
+                                                source_command=self._search_venues.get_command_uri())
 
         return rdf_data
 
