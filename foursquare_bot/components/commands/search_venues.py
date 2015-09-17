@@ -9,12 +9,9 @@ logger = logging.getLogger(__name__)
 
 class SearchVenues(BaseCommand):
 
-    def initialize_command(self):
-        super(SearchVenues, self).initialize_command()
-
-        logger.info('Initialize Command')
-        self._initialize_command(identifier='search_venues', name='Search Venues',
-                                 additional_dependencies={'foursquare_lookup', })
+    name = 'search_venues'
+    dependencies = BaseCommand.default_dependencies.union({'foursquare_lookup', })
+    description = 'Search Venues'
 
     def post_init(self):
         super(SearchVenues, self).post_init()
