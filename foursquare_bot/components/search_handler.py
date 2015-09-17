@@ -28,6 +28,14 @@ class SearchHandler(base_plugin):
 
     type_requirements = {str(WGS_84.SpatialThing), }
 
+    query = """MATCH (n:`%s`)<-[r:`http://purl.org/NET/c4dm/event.owl#place`]-(m)
+                   WHERE
+                      any(seeAlso in n.`%s` where seeAlso =~ '^foursquare:.*')
+                   RETURN n AS node, count(r) AS rels, n.`%s` AS name
+                   ORDER BY rels DESC LIMIT 10""" % (str(WGS_84.SpatialThing),
+                                                     str(RDFS.seeAlso),
+                                                     str(SCHEMA.name))
+
     def plugin_init(self):
         pass
 
@@ -45,22 +53,20 @@ class SearchHandler(base_plugin):
         Find node to do work over.
         :return:
         """
-        query = """MATCH (n:`%s`)<-[r:`http://purl.org/NET/c4dm/event.owl#place`]-(m)
-                   WHERE
-                      any(seeAlso in n.`%s` where seeAlso =~ '^foursquare:.*')
-                   RETURN n AS node, count(r) AS rels, n.`%s` AS name
-                   ORDER BY rels DESC LIMIT 10""" % (str(WGS_84.SpatialThing),
-                                                     str(RDFS.seeAlso),
-                                                     str(SCHEMA.name))
+        form = rdf_payload.get('form', None)
+        payload = StoragePayload(form)
+
+        if not self._process_payload(payload):
+            return None
 
         translation_key = dict(json.loads(CypherFlags.TRANSLATION_KEY.default))
         translation_key[str(SCHEMA.name)] = 'name'
         translation_key[str(GRAPH.degree)] = 'rels'
 
-        logger.debug('Executing query: %s' % query)
+        logger.debug('Executing query: %s' % self.query)
 
         payload = StoragePayload()
-        payload.add_property(key=NEO4J.cypher, value=query)
+        payload.add_property(key=NEO4J.cypher, value=self.query)
         payload.add_flag(CypherFlags.TRANSLATION_KEY, json.dumps(translation_key))
 
         promise = self._storage_client.execute_cypher(payload).then(self._process_results)
@@ -84,6 +90,15 @@ class SearchHandler(base_plugin):
                                                 source_command=self._search_venues.get_command_uri())
 
         return rdf_data
+
+    def _process_payload(self, payload):
+        """
+        Determines whether the payload should be processed or not.
+        :return: boolean
+        """
+        intersection = self.type_requirements.intersection(set(payload.types))
+        return len(intersection) == len(self.type_requirements)
+
 
 
 search_handler = SearchHandler
