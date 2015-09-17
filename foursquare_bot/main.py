@@ -9,12 +9,6 @@ parser.add_option('-c', dest="filename", help="Configuration file for the bot", 
 configuration.load_file(options.filename)
 
 bot = RhoBot()
-
-# Rho Optional Components
-bot.register_plugin('rho_bot_storage_client', module='rhobot.components')
-bot.register_plugin('rho_bot_rdf_publish', module='rhobot.components')
-bot.register_plugin('rho_bot_representation_manager', module='rhobot.components')
-
 # Bot Specific Components
 bot.register_plugin('foursquare_lookup', module='foursquare_bot.components')
 bot.register_plugin('knowledge_provider', module='foursquare_bot.components')
