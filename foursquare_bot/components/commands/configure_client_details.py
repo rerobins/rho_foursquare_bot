@@ -5,6 +5,7 @@ from foursquare_bot.components.events import OAUTH_DETAILS_UPDATED
 
 logger = logging.getLogger(__name__)
 
+
 class ConfigureClientDetails(BaseCommand):
     """
     Plugin that will configure the client details for the service to connect to the google apis.
@@ -20,7 +21,7 @@ class ConfigureClientDetails(BaseCommand):
     def command_start(self, request, initial_session):
         """
         Create the form that asks for the clientId, clientSecret,
-        :param iq:
+        :param request:
         :param initial_session:
         :return:
         """

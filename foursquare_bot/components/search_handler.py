@@ -100,5 +100,4 @@ class SearchHandler(base_plugin):
         return len(intersection) == len(self.type_requirements)
 
 
-
 search_handler = SearchHandler
