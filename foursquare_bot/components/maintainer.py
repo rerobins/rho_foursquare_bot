@@ -24,12 +24,19 @@ class KnowledgeMaintainer(base_plugin):
     work_to_do_delay = 1.0
     no_work_delay = 600.0
 
+    query = """MATCH (n:`%s`)
+                   WHERE any(seealso IN n.`%s` WHERE seealso =~ '^foursquare:.*')
+                   and not(has(n.`%s`)) RETURN n as node LIMIT 1""" % (str(WGS_84.SpatialThing),
+                                                                       str(RDFS.seeAlso),
+                                                                       str(SCHEMA.name))
+
     def plugin_init(self):
         """
         Start the process when the configuration is updated.
         :return:
         """
         self.xmpp.add_event_handler(BotConfiguration.CONFIGURATION_RECEIVED_EVENT, self._configuration_updated)
+        self.query = ' '.join(self.query.replace('\n', ' ').replace('\r', '').split())
 
     def post_init(self):
         super(KnowledgeMaintainer, self).post_init()
@@ -76,16 +83,10 @@ class KnowledgeMaintainer(base_plugin):
         Find node to do work over.
         :return:
         """
-        query = """MATCH (n:`%s`)
-                   WHERE any(seealso IN n.`%s` WHERE seealso =~ '^foursquare:.*')
-                   and not(has(n.`%s`)) RETURN n as node LIMIT 1""" % (str(WGS_84.SpatialThing),
-                                                                       str(RDFS.seeAlso),
-                                                                       str(SCHEMA.name))
-
-        logger.debug('Executing query: %s' % query)
+        logger.debug('Executing query: %s' % self.query)
 
         payload = StoragePayload()
-        payload.add_property(key=NEO4J.cypher, value=query)
+        payload.add_property(key=NEO4J.cypher, value=self.query)
         promise = self._storage_client.execute_cypher(payload).then(
             self._scheduler.generate_promise_handler(self._handle_results, session))
 

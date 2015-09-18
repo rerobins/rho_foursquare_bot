@@ -37,7 +37,7 @@ class SearchHandler(base_plugin):
                                                      str(SCHEMA.name))
 
     def plugin_init(self):
-        pass
+        self.query = ' '.join(self.query.replace('\n', ' ').replace('\r', '').split())
 
     def post_init(self):
         super(SearchHandler, self).post_init()
