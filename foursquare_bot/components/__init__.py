@@ -6,7 +6,7 @@ from foursquare_bot.components.search_handler import search_handler
 from sleekxmpp.plugins.base import register_plugin
 
 
-def register_components():
+def load_components():
     """
     Register the core plugins for the system.
     :return: None
